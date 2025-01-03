@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Case Prep Group</title>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
+    <style>
+        body { font-family: Arial, sans-serif; padding: 20px; text-align: center; }
+        table { margin: 20px auto; border-collapse: collapse; width: 80%; }
+        th, td { border: 1px solid #ddd; padding: 8px; text-align: center; }
+        th { background-color: #f2f2f2; }
+        button { padding: 8px 16px; background-color: green; color: white; border: none; cursor: pointer; }
+        button.disabled { background-color: gray; cursor: not-allowed; }
+        #popup { display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: #fff; border: 1px solid #ddd; padding: 20px; z-index: 1000; }
+        #overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.5); z-index: 999; }
+    </style>
+</head>
+<body>
+    <h1>Case Prep Group</h1>
+    <label for="tutor">Select Tutor: </label>
+    <select id="tutor">
+        <!-- Tutors will be populated dynamically -->
+    </select>
+    <br><br>
+    <div id="details">
+        <p>Location: <span id="location"></span></p>
+        <p>Contact: <span id="contact"></span></p>
+    </div>
+    <br>
+    <table>
+        <thead>
+            <tr>
+                <th>Slot Number</th>
+                <th>Slot Timing</th>
+                <th>Available?</th>
+            </tr>
+        </thead>
+        <tbody id="slots">
+            <!-- Slots will be populated dynamically -->
+        </tbody>
+    </table>
+
+    <!-- Booking Popup -->
+    <div id="overlay"></div>
+    <div id="popup">
+        <h3>Book Slot</h3>
+        <label for="name">Name: </label><input type="text" id="name"><br><br>
+        <label for="phone">Phone: </label><input type="text" id="phone"><br><br>
+        <button onclick="confirmBooking()">Confirm</button>
+        <button onclick="closePopup()">Cancel</button>
+    </div>
+
+    <script>
+        // Supabase Config
+        const SUPABASE_URL = 'YOUR_SUPABASE_URL';
+        const SUPABASE_KEY = 'YOUR_SUPABASE_PUBLIC_KEY';
+        const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+        const tutorSelect = document.getElementById('tutor');
+        const locationSpan = document.getElementById('location');
+        const contactSpan = document.getElementById('contact');
+        const slotsTable = document.getElementById('slots');
+
+        const overlay = document.getElementById('overlay');
+        const popup = document.getElementById('popup');
+        let selectedSlot;
+
+        // Fetch Tutors
+        async function fetchTutors() {
+            const { data: tutors, error } = await supabase.from('tutors').select('*');
+            if (error) {
+                console.error('Error fetching tutors:', error);
+                return;
+            }
+            tutors.forEach(tutor => {
+                const option = document.createElement('option');
+                option.value = tutor.id;
+                option.textContent = tutor.name;
+                tutorSelect.appendChild(option);
+            });
+            fetchTutorDetails(tutors[0].id); // Load first tutor's details by default
+        }
+
+        // Fetch Tutor Details
+        async function fetchTutorDetails(tutorId) {
+            const { data: tutor, error } = await supabase.from('tutors').select('*').eq('id', tutorId).single();
+            if (error) {
+                console.error('Error fetching tutor details:', error);
+                return;
+            }
+            locationSpan.textContent = tutor.location;
+            contactSpan.textContent = tutor.contact;
+            fetchSlots(tutorId);
+        }
+
+        // Fetch Slots
+        async function fetchSlots(tutorId) {
+            const { data: slots, error } = await supabase.from('slots').select('*').eq('tutor_id', tutorId);
+            if (error) {
+                console.error('Error fetching slots:', error);
+                return;
+            }
+            slotsTable.innerHTML = '';
+            slots.forEach((slot, index) => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${index + 1}</td>
+                    <td>${slot.time}</td>
+                    <td>
+                        ${slot.available 
+                            ? `<button onclick="openPopup(${slot.id})">Book</button>` 
+                            : 'Booked'}
+                    </td>
+                `;
+                slotsTable.appendChild(row);
+            });
+        }
+
+        // Open Booking Popup
+        function openPopup(slotId) {
+            selectedSlot = slotId;
+            overlay.style.display = 'block';
+            popup.style.display = 'block';
+        }
+
+        // Close Booking Popup
+        function closePopup() {
+            overlay.style.display = 'none';
+            popup.style.display = 'none';
+        }
+
+        // Confirm Booking
+        async function confirmBooking() {
+            const name = document.getElementById('name').value;
+            const phone = document.getElementById('phone').value;
+
+            const { error } = await supabase.from('bookings').insert([{ slot_id: selectedSlot, name, phone }]);
+            if (error) {
+                console.error('Error creating booking:', error);
+                return;
+            }
+
+            await supabase.from('slots').update({ available: false }).eq('id', selectedSlot);
+            alert('Booking Confirmed');
+            closePopup();
+            fetchTutorDetails(tutorSelect.value);
+        }
+
+        tutorSelect.addEventListener('change', () => fetchTutorDetails(tutorSelect.value));
+
+        // Initialize
+        fetchTutors();
+    </script>
+</body>
+</html>
