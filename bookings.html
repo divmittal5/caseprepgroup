@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tutor Bookings</title>
+    <script type="module">
+        import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm';
+
+        const SUPABASE_URL = 'https://rcjpzwpoyxgqyazourla.supabase.co';
+        const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJjanB6d3BveXhncXlhem91cmxhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MzU5MzgyNzYsImV4cCI6MjA1MTUxNDI3Nn0.bl0y1oyf9fiyhGL2xyNNpsthrqMax1QFbK0nmotF9uo';
+        const supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
+
+        // Extract the tutor name from the URL
+        const tutorName = window.location.pathname.split('/')[2];  // e.g. /bookings/tutorname
+
+        // Fetch tutor ID based on tutor name
+        async function fetchBookings() {
+            try {
+                const { data: tutor, error: tutorError } = await supabase
+                    .from('tutors')
+                    .select('id')
+                    .eq('name', tutorName)
+                    .single();
+
+                if (tutorError) {
+                    console.error('Error fetching tutor:', tutorError);
+                    return;
+                }
+
+                // Fetch bookings for this tutor
+                const { data: bookings, error: bookingsError } = await supabase
+                    .from('bookings')
+                    .select('slot_id, name, phone')
+                    .eq('slot_id.tutor_id', tutor.id)
+                    .join('slots', 'slot_id', 'slots.id');
+
+                if (bookingsError) {
+                    console.error('Error fetching bookings:', bookingsError);
+                    return;
+                }
+
+                const bookingTable = document.getElementById('bookingTable');
+                bookings.forEach(booking => {
+                    const row = document.createElement('tr');
+                    row.innerHTML = `
+                        <td>${booking.slot_id}</td>
+                        <td>${new Date(booking.slot_id.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</td>
+                        <td>${booking.name}</td>
+                        <td>${booking.phone}</td>
+                    `;
+                    bookingTable.appendChild(row);
+                });
+            } catch (err) {
+                console.error('Error fetching bookings:', err);
+            }
+        }
+
+        fetchBookings();
+    </script>
+</head>
+<body>
+    <h1>Bookings for Tutor: <span id="tutorName">${tutorName}</span></h1>
+    <table border="1">
+        <thead>
+            <tr>
+                <th>Slot Number</th>
+                <th>Slot Time</th>
+                <th>Student Name</th>
+                <th>Phone Number</th>
+            </tr>
+        </thead>
+        <tbody id="bookingTable">
+            <!-- Bookings will be populated dynamically -->
+        </tbody>
+    </table>
+</body>
+</html>
