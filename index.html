@@ -181,17 +181,55 @@ window.confirmBooking = async function () {
     const name = document.getElementById('name').value;
     const phone = document.getElementById('phone').value;
 
-    const { error } = await supabase.from('bookings').insert([{ slot_id: selectedSlot, name, phone }]);
-    if (error) {
-        console.error('Error creating booking:', error);
-        return;
+    // const { error } = await supabase.from('bookings').insert([{ slot_id: selectedSlot, name, phone }]);
+    // if (error) {
+    //     console.error('Error creating booking:', error);
+    //     return;
+    // }
+
+    // await supabase.from('slots').update({ available: false }).eq('id', selectedSlot);
+    // alert('Booking Confirmed');
+    // closePopup();
+    // fetchSlots(tutorSelect.value);
+    // fetchTutorDetails(tutorSelect.value);
+
+    try {
+        // Insert booking details into the 'bookings' table
+        const { error: insertError } = await supabase
+            .from('bookings')
+            .insert([{ slot_id: selectedSlot, name, phone }]);
+        
+        if (insertError) {
+            console.error('Error creating booking:', insertError);
+            alert('Failed to book the slot. Please try again.');
+            return;
+        }
+
+        // Update the slot's availability in the 'slots' table
+        const { error: updateError } = await supabase
+            .from('slots')
+            .update({ available: false })
+            .eq('id', selectedSlot);
+        
+        if (updateError) {
+            console.error('Error updating slot availability:', updateError);
+            alert('Failed to update slot availability. Please contact support.');
+            return;
+        }
+
+        alert('Booking Confirmed');
+        closePopup();
+
+        // Refresh the slots to reflect the updated availability
+        fetchSlots(tutorSelect.value);
+
+    } catch (err) {
+        console.error('Unexpected error:', err);
+        alert('An unexpected error occurred. Please try again.');
     }
 
-    await supabase.from('slots').update({ available: false }).eq('id', selectedSlot);
-    alert('Booking Confirmed');
-    closePopup();
-    fetchSlots(tutorSelect.value);
-    fetchTutorDetails(tutorSelect.value);
+
+    
 };
 
 
