@@ -116,9 +116,9 @@
             const nowUTC = new Date();
             const IST_OFFSET = 5.5 * 60 * 60 * 1000;
             const nowIST = new Date(nowUTC.getTime() + IST_OFFSET);
-            const year = now.getFullYear();
-            const month = now.getMonth(); // 0-indexed
-            const date = now.getDate();
+            const year = nowIST.getFullYear();
+            const month = nowIST.getMonth(); // 0-indexed
+            const date = nowIST.getDate();
 
             // Create start and end timestamps for the current day in IST
             const todayStartIST = new Date(year, month, date, 0, 0, 0).toISOString();
