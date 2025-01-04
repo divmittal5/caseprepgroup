@@ -135,11 +135,7 @@
             slotsTable.innerHTML = '';
             slots.forEach((slot, index) => {
 
-                const { data: bookingData, error: bookingError } = await supabase
-                    .from('bookings')
-                    .select('name')
-                    .eq('slot_id', slot.id)
-                    .single(); // Assuming one booking per slot
+                const { data: bookingData, error: bookingError } = await supabase.from('bookings').select('name').eq('slot_id', slot.id).single(); // Assuming one booking per slot
 
                 console.log('bookingdata: ', bookingData);
                 
