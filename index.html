@@ -4,8 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Case Prep Group</title>
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.0.0/dist/umd/supabase.min.js"></script>
-    <script src="supabase.js" defer></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.0.0/dist/supabase.min.js"></script>
     <style>
         body { font-family: Arial, sans-serif; padding: 20px; text-align: center; }
         table { margin: 20px auto; border-collapse: collapse; width: 80%; }
@@ -55,10 +54,10 @@
 
     <script>
         // Supabase Config
-        // const SUPABASE_URL = 'https://rcjpzwpoyxgqyazourla.supabase.co';
-        // const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJjanB6d3BveXhncXlhem91cmxhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MzU5MzgyNzYsImV4cCI6MjA1MTUxNDI3Nn0.bl0y1oyf9fiyhGL2xyNNpsthrqMax1QFbK0nmotF9uo';
+        const SUPABASE_URL = 'https://rcjpzwpoyxgqyazourla.supabase.co';
+        const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJjanB6d3BveXhncXlhem91cmxhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MzU5MzgyNzYsImV4cCI6MjA1MTUxNDI3Nn0.bl0y1oyf9fiyhGL2xyNNpsthrqMax1QFbK0nmotF9uo';
         
-        // const supabase = createClient(SUPABASE_URL, SUPABASE_KEY)
+        const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
         const tutorSelect = document.getElementById('tutor');
         const locationSpan = document.getElementById('location');
