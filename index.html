@@ -133,35 +133,66 @@
             });
         }
 
+        // // Open Booking Popup
+        // function openPopup(slotId) {
+        //     selectedSlot = slotId;
+        //     overlay.style.display = 'block';
+        //     popup.style.display = 'block';
+        // }
+
+        // // Close Booking Popup
+        // function closePopup() {
+        //     overlay.style.display = 'none';
+        //     popup.style.display = 'none';
+        // }
+
+        // // Confirm Booking
+        // async function confirmBooking() {
+        //     const name = document.getElementById('name').value;
+        //     const phone = document.getElementById('phone').value;
+
+        //     const { error } = await supabase.from('bookings').insert([{ slot_id: selectedSlot, name, phone }]);
+        //     if (error) {
+        //         console.error('Error creating booking:', error);
+        //         return;
+        //     }
+
+        //     await supabase.from('slots').update({ available: false }).eq('id', selectedSlot);
+        //     alert('Booking Confirmed');
+        //     closePopup();
+        //     fetchTutorDetails(tutorSelect.value);
+        // }
+
         // Open Booking Popup
-        function openPopup(slotId) {
-            selectedSlot = slotId;
-            overlay.style.display = 'block';
-            popup.style.display = 'block';
-        }
+window.openPopup = function (slotId) {
+    selectedSlot = slotId;
+    overlay.style.display = 'block';
+    popup.style.display = 'block';
+};
 
-        // Close Booking Popup
-        function closePopup() {
-            overlay.style.display = 'none';
-            popup.style.display = 'none';
-        }
+// Close Booking Popup
+window.closePopup = function () {
+    overlay.style.display = 'none';
+    popup.style.display = 'none';
+};
 
-        // Confirm Booking
-        async function confirmBooking() {
-            const name = document.getElementById('name').value;
-            const phone = document.getElementById('phone').value;
+// Confirm Booking
+window.confirmBooking = async function () {
+    const name = document.getElementById('name').value;
+    const phone = document.getElementById('phone').value;
 
-            const { error } = await supabase.from('bookings').insert([{ slot_id: selectedSlot, name, phone }]);
-            if (error) {
-                console.error('Error creating booking:', error);
-                return;
-            }
+    const { error } = await supabase.from('bookings').insert([{ slot_id: selectedSlot, name, phone }]);
+    if (error) {
+        console.error('Error creating booking:', error);
+        return;
+    }
 
-            await supabase.from('slots').update({ available: false }).eq('id', selectedSlot);
-            alert('Booking Confirmed');
-            closePopup();
-            fetchTutorDetails(tutorSelect.value);
-        }
+    await supabase.from('slots').update({ available: false }).eq('id', selectedSlot);
+    alert('Booking Confirmed');
+    closePopup();
+    fetchTutorDetails(tutorSelect.value);
+};
+
 
         tutorSelect.addEventListener('change', () => fetchTutorDetails(tutorSelect.value));
 
