@@ -133,29 +133,54 @@
                 console.log('Slots for today in IST:', slots);
             }        
             slotsTable.innerHTML = '';
-            slots.forEach((slot, index) => {
+            // slots.forEach((slot, index) => {
 
-                const { data: bookingData, error: bookingError } = await supabase.from('bookings').select('name').eq('slot_id', slot.id).single(); // Assuming one booking per slot
+            //     const { data: bookingData, error: bookingError } = await supabase.from('bookings').select('name').eq('slot_id', slot.id).single(); // Assuming one booking per slot
 
-                console.log('bookingdata: ', bookingData);
+            //     console.log('bookingdata: ', bookingData);
                 
-                if (bookingError) {
-                    console.error('Error fetching booking data:', bookingError);
-                }
+            //     if (bookingError) {
+            //         console.error('Error fetching booking data:', bookingError);
+            //     }
 
                 
-                const row = document.createElement('tr');
-                row.innerHTML = `
-                    <td>${index + 1}</td>
-                    <td>${new Date(slot.timestamp).toLocaleTimeString([], { year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit' })}</td>
-                    <td>
-                        ${slot.available 
-                            ? `<button onclick="openPopup(${slot.id})">Book</button>` 
-                            : '<span title="Booked by: ${bookingData ? bookingData.name : 'Unknown'}">Booked</span>'}
-                    </td>
-                `;
-                slotsTable.appendChild(row);
-            });
+            //     const row = document.createElement('tr');
+            //     row.innerHTML = `
+            //         <td>${index + 1}</td>
+            //         <td>${new Date(slot.timestamp).toLocaleTimeString([], { year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit' })}</td>
+            //         <td>
+            //             ${slot.available 
+            //                 ? `<button onclick="openPopup(${slot.id})">Book</button>` 
+            //                 : '<span title="Booked by: ${bookingData ? bookingData.name : 'Unknown'}">Booked</span>'}
+            //         </td>
+            //     `;
+            //     slotsTable.appendChild(row);
+            // });
+
+            // Loop over each slot to fetch booking details
+    for (const slot of slots) {
+        const { data: bookingData, error: bookingError } = await supabase.from('bookings').select('name').eq('slot_id', slot.id).single(); // Assuming one booking per slot
+        
+        let bookedBy = 'Unknown';
+        if (!bookingError && bookingData) {
+            bookedBy = bookingData.name;
+        }
+
+        const row = document.createElement('tr');
+        row.innerHTML = `
+            <td>${slot.id}</td>
+            <td>${new Date(slot.timestamp).toLocaleTimeString([], { year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit' })}</td>
+            <td>
+                ${slot.available 
+                    ? `<button onclick="openPopup(${slot.id})">Book</button>` 
+                    : `<span title="Booked by: ${bookedBy}">Booked</span>`}
+            </td>
+        `;
+        slotsTable.appendChild(row);
+    }
+
+
+            
         }
 
         // // Open Booking Popup
