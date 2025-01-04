@@ -126,7 +126,7 @@
                     <td>
                         ${slot.available 
                             ? `<button onclick="openPopup(${slot.id})">Book</button>` 
-                            : 'Booked'}
+                            : '<span>Booked</span>'}
                     </td>
                 `;
                 slotsTable.appendChild(row);
@@ -190,6 +190,7 @@ window.confirmBooking = async function () {
     await supabase.from('slots').update({ available: false }).eq('id', selectedSlot);
     alert('Booking Confirmed');
     closePopup();
+    fetchSlots(tutorSelect.value);
     fetchTutorDetails(tutorSelect.value);
 };
 
