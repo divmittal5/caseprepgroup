@@ -134,6 +134,20 @@
             }        
             slotsTable.innerHTML = '';
             slots.forEach((slot, index) => {
+
+                const { data: bookingData, error: bookingError } = await supabase
+                    .from('bookings')
+                    .select('name')
+                    .eq('slot_id', slot.id)
+                    .single(); // Assuming one booking per slot
+
+                console.log('bookingdata: ', bookingData);
+                
+                if (bookingError) {
+                    console.error('Error fetching booking data:', bookingError);
+                }
+
+                
                 const row = document.createElement('tr');
                 row.innerHTML = `
                     <td>${index + 1}</td>
@@ -141,7 +155,7 @@
                     <td>
                         ${slot.available 
                             ? `<button onclick="openPopup(${slot.id})">Book</button>` 
-                            : '<span>Booked</span>'}
+                            : '<span title="Booked by: ${bookingData ? bookingData.name : 'Unknown'}">Booked</span>'}
                     </td>
                 `;
                 slotsTable.appendChild(row);
