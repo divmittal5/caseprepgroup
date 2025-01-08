@@ -60,6 +60,11 @@
         <button onclick="closePopup()">Cancel</button>
     </div>
 
+    <!-- Visitor Counter -->
+    <div id="visitor-counter">
+        Total Visitors: <span id="visitor-count">Loading...</span>
+    </div>
+
 
     <script type="module">
         // Supabase Config
@@ -283,6 +288,39 @@ window.confirmBooking = async function () {
 };
 
 
+        const visitorCountElement = document.getElementById('visitor-count');
+        async function updateVisitorCount() {
+            try {
+                // Fetch the current visitor count
+                const { data, error } = await supabase
+                    .from('visitor_count')
+                    .select('count')
+                    .eq('id', 1)
+                    .single();
+
+                if (error) throw error;
+
+                let currentCount = data.count;
+
+                // Increment the visitor count
+                const { error: updateError } = await supabase
+                    .from('visitor_count')
+                    .update({ count: currentCount + 1 })
+                    .eq('id', 1);
+
+                if (updateError) throw updateError;
+
+                // Update the displayed count
+                visitorCountElement.textContent = currentCount + 1;
+            } catch (err) {
+                console.error('Error updating visitor count:', err);
+                visitorCountElement.textContent = 'Error';
+            }
+        }
+        // Initialize visitor count update
+        updateVisitorCount();
+
+        
         tutorSelect.addEventListener('change', () => fetchTutorDetails(tutorSelect.value));
 
         // Initialize
